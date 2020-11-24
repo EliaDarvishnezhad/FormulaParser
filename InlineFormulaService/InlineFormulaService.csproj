@@ -47,6 +47,9 @@
     <Compile Include="Dto\InlineFormulaEntryDto.cs" />
     <Compile Include="Dto\OperandInlineFormulaEntryInfoDto.cs" />
     <Compile Include="Dto\OperatorInlineFormulaEntryInfoDto.cs" />
+    <Compile Include="Enumeration\InlineFormulaEntryType.cs" />
+    <Compile Include="Enumeration\InlineFormulaOperandType.cs" />
+    <Compile Include="Enumeration\InlineFormulaOperatorType.cs" />
     <Compile Include="Interface\IProductInlineFormulaService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
