@@ -1,4 +1,5 @@
 ﻿using InlineFormulaService.Exceptions;
+using InlineFormulaService.Service;
 using Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula;
 using Septa.PayamGostar.Domain.Model.Enumeration.BaseInfo.InlineFormula;
 using Septa.PayamGostar.Domain.Service.ProductManagement;
@@ -10,29 +11,6 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 {
 	public class ProductInlineFormulaService : IProductInlineFormulaService
 	{
-		public const char PlusSign = '+';
-		public const char MinusSign = '-';
-		public const char AsteriskSign = '*';
-		public const char SlashSign = '/';
-
-
-		private Dictionary<InlineFormulaOperatorType, char> _operatorTypeSignPairDictionary;
-		public Dictionary<InlineFormulaOperatorType, char> OperatorTypeSignPairDictionary
-		{
-			get
-			{
-				if (_operatorTypeSignPairDictionary is null)
-				{
-					_operatorTypeSignPairDictionary = new Dictionary<InlineFormulaOperatorType, char>(){
-					{ InlineFormulaOperatorType.Add, PlusSign},
-					{ InlineFormulaOperatorType.Subtract, MinusSign },
-					{ InlineFormulaOperatorType.Multiply, AsteriskSign },
-					{ InlineFormulaOperatorType.Divide, SlashSign }};
-				}
-				return _operatorTypeSignPairDictionary;
-			}
-		}
-
 
 		public ProductInlineFormulaService()
 		{
@@ -58,7 +36,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 				inlineFormulaEntries = this.ParseFormulaEntries(formula);
 				return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
 				inlineFormulaEntries = null;
 				return false;
@@ -88,8 +66,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 
 		#region Private Methods
 
-
-		private List<InlineFormulaEntry> ParseFormula(string formula)
+		private IEnumerable<InlineFormulaEntry> ParseFormula(string formula)
 		{
 			List<InlineFormulaEntry> toReturn = null;
 
@@ -108,34 +85,25 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 					{
 						if (this.IsVariableEntry(splitedEntries[i]))
 						{
-							entry = new InlineFormulaEntry
-							{
-								EntryIndex = entryIndexCounter,
-								FormulaEntryType = InlineFormulaEntryType.Operand,
-								FormulaEntryInfo = new OperandInlineFormulaEntryInfo(splitedEntries[i], InlineFormulaOperandType.Variable)
-							};
+							var entryInfo = new OperandInlineFormulaEntryInfo(splitedEntries[i], InlineFormulaOperandType.Variable);
+
+							entry = new InlineFormulaEntry(entryInfo, entryIndexCounter);
 						}
 						else if (this.IsConstantValueEntry(splitedEntries[i]))
 						{
-							entry = new InlineFormulaEntry
-							{
-								EntryIndex = entryIndexCounter,
-								FormulaEntryType = InlineFormulaEntryType.Operand,
-								FormulaEntryInfo = new OperandInlineFormulaEntryInfo(splitedEntries[i], InlineFormulaOperandType.ConstantValue)
-							};
+							var entryInfo = new OperandInlineFormulaEntryInfo(splitedEntries[i], InlineFormulaOperandType.ConstantValue);
+
+							entry = new InlineFormulaEntry(entryInfo, entryIndexCounter);
 						}
 						else if (this.IsOperatorEntry(splitedEntries[i]))
 						{
-							var revertedDictionary = this.OperatorTypeSignPairDictionary.ToDictionary(k => k.Value, v => v.Key);
+							var revertedDictionary = InlineFormulaEntryInfoBuilder.OperatorTypeSignPairDictionary.ToDictionary(k => k.Value, v => v.Key);
 
 							var operatorType = revertedDictionary[splitedEntries[i].Trim().FirstOrDefault()];
 
-							entry = new InlineFormulaEntry
-							{
-								EntryIndex = entryIndexCounter,
-								FormulaEntryType = InlineFormulaEntryType.Operator,
-								FormulaEntryInfo = new OperatorInlineFormulaEntryInfo(splitedEntries[i], operatorType)
-							};
+							var entryInfo = new OperatorInlineFormulaEntryInfo(splitedEntries[i], operatorType);
+
+							entry = new InlineFormulaEntry(entryInfo, entryIndexCounter);
 						}
 						else
 						{
@@ -143,10 +111,13 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 						}
 
 						toReturn.Add(entry);
+
 						entryIndexCounter++;
 					}
 				}
 			}
+
+			this.ProcessPostParsingValidation(toReturn);
 
 			return toReturn;
 		}
@@ -163,7 +134,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 					trimmedEntry.EndsWith("]") &&
 					trimmedEntry.Length > 2)
 				{
-
+					toReturn = true;
 				}
 			}
 
@@ -191,9 +162,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			var trimmedEntry = entry?.Trim();
 
 			if (!string.IsNullOrEmpty(trimmedEntry))
-			{
-				toReturn = this.OperatorTypeSignPairDictionary.Values.Any(x => x.Equals(trimmedEntry));
-			}
+				toReturn = InlineFormulaEntryInfoBuilder.OperatorTypeSignPairDictionary.Values.Any(x => x.ToString().Equals(trimmedEntry));
 
 			return toReturn;
 		}
@@ -205,7 +174,28 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 
 			if (formulaEntries.Any())
 			{
-				throw new NotImplementedException();
+				formulaEntries = formulaEntries.OrderBy(x => x.EntryIndex).ToList();
+
+				var firstEntry = formulaEntries.Single(x => x.EntryIndex == 0);
+
+				if (firstEntry.EntryType == InlineFormulaEntryType.Operator)
+					throw new UnexpectedEntryTokenException(
+						firstEntry.EntryType,
+						firstEntry.EntryInfo.RawToken,
+						firstEntry.EntryIndex);
+
+				for (int i = 0; i < formulaEntries.Count; i++)
+				{
+					var nextEntryIndex = i + 1;
+					if (nextEntryIndex < formulaEntries.Count)
+					{
+						if (formulaEntries[i].EntryType == formulaEntries[nextEntryIndex].EntryType)
+							throw new UnexpectedEntryTokenException(
+								formulaEntries[nextEntryIndex].EntryType,
+								formulaEntries[nextEntryIndex].EntryInfo.RawToken,
+								formulaEntries[nextEntryIndex].EntryIndex);
+					}
+				}
 			}
 		}
 

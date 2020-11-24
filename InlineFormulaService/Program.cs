@@ -25,7 +25,7 @@ namespace InlineFormulaService
 
 				if (!string.IsNullOrEmpty(formulaText))
 				{
-					//formulaService.ValidateFormulaSyntax(formulaText);
+					var entries = formulaService.TryParseFormulaEntries(formulaText,out var result);
 				}
 
 			}

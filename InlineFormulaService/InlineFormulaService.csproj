@@ -43,10 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dto\BaseInlineFormulaEntryInfoDto.cs" />
-    <Compile Include="Dto\InlineFormulaEntryDto.cs" />
-    <Compile Include="Dto\OperandInlineFormulaEntryInfoDto.cs" />
-    <Compile Include="Dto\OperatorInlineFormulaEntryInfoDto.cs" />
+    <Compile Include="Dto\BaseInlineFormulaEntryInfo.cs" />
+    <Compile Include="Dto\InlineFormulaEntry.cs" />
+    <Compile Include="Dto\OperandInlineFormulaEntryInfo.cs" />
+    <Compile Include="Dto\OperatorInlineFormulaEntryInfo.cs" />
     <Compile Include="Enumeration\InlineFormulaEntryType.cs" />
     <Compile Include="Enumeration\InlineFormulaOperandType.cs" />
     <Compile Include="Enumeration\InlineFormulaOperatorType.cs" />
@@ -54,6 +54,7 @@
     <Compile Include="Interface\IProductInlineFormulaService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\InlineFormulaEntryInfoBuilder.cs" />
     <Compile Include="Service\ProductInlineFormulaService.cs" />
   </ItemGroup>
   <ItemGroup>
