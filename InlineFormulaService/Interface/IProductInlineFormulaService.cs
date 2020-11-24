@@ -3,12 +3,14 @@ using System.Collections.Generic;
 
 namespace Septa.PayamGostar.Domain.Service.ProductManagement
 {
-    public interface IProductInlineFormulaService
-    {
-        bool ValidateFormulaSyntax(string formula, IEnumerable<string> supportedVariableCollection);
-        IEnumerable<OperandInlineFormulaEntryInfoDto> GetListOfUsedVariablesInFormula(string formula);
+	public interface IProductInlineFormulaService
+	{
+		IEnumerable<InlineFormulaEntry> ParseFormulaEntries(string formula);
+		bool TryParseFormulaEntries(string formula, out IEnumerable<InlineFormulaEntry> inlineFormulaEntries);
 
-        decimal CalculateFormula(string formula, Dictionary<string, decimal> variableValues);
-        decimal CalculateFormula(IEnumerable<InlineFormulaEntryDto> inlineFormulaEntryCollection, Dictionary<string, decimal> variableValues);
-    }
+		IEnumerable<OperandInlineFormulaEntryInfo> GetListOfUsedVariablesInFormula(string formula);
+
+		decimal CalculateFormula(string formula, Dictionary<string, decimal> variableValues);
+		decimal CalculateFormula(IEnumerable<InlineFormulaEntry> inlineFormulaEntryCollection, Dictionary<string, decimal> variableValues);
+	}
 }
