@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -45,6 +48,7 @@
   <ItemGroup>
     <Compile Include="Dto\BaseInlineFormulaEntryInfo.cs" />
     <Compile Include="Dto\InlineFormulaEntry.cs" />
+    <Compile Include="Dto\InlineFormulaEntryTokenDto.cs" />
     <Compile Include="Dto\OperandInlineFormulaEntryInfo.cs" />
     <Compile Include="Dto\OperatorInlineFormulaEntryInfo.cs" />
     <Compile Include="Enumeration\InlineFormulaEntryType.cs" />
@@ -60,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

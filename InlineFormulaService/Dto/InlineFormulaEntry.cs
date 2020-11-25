@@ -48,5 +48,10 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 		public int EntryIndex { get; private set; }
 		public InlineFormulaEntryType EntryType { get; private set; }
 		public BaseInlineFormulaEntryInfo EntryInfo { get; private set; }
+
+		public override string ToString()
+		{
+			return this.EntryInfo.RawToken;
+		}
 	}
 }

@@ -6,7 +6,15 @@ namespace Septa.PayamGostar.Domain.Service.ProductManagement
 	public interface IProductInlineFormulaService
 	{
 		IEnumerable<InlineFormulaEntry> ParseFormulaEntries(string formula);
-		bool TryParseFormulaEntries(string formula, out IEnumerable<InlineFormulaEntry> inlineFormulaEntries);
+		IEnumerable<InlineFormulaEntry> ParseFormulaEntries(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection);
+
+		bool TryParseFormulaEntries(
+			string formula,
+			out IEnumerable<InlineFormulaEntry> inlineFormulaEntries);
+		bool TryParseFormulaEntries(
+			IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection,
+			out IEnumerable<InlineFormulaEntry> inlineFormulaEntries);
+
 
 		IEnumerable<OperandInlineFormulaEntryInfo> GetListOfUsedVariablesInFormula(string formula);
 

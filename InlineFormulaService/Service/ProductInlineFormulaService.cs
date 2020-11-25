@@ -11,7 +11,6 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 {
 	public class ProductInlineFormulaService : IProductInlineFormulaService
 	{
-
 		public ProductInlineFormulaService()
 		{
 
@@ -29,11 +28,29 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			throw new NotImplementedException();
 		}
 
-		public bool TryParseFormulaEntries(string formula, out IEnumerable<InlineFormulaEntry> inlineFormulaEntries)
+		public bool TryParseFormulaEntries(
+			string formula,
+			out IEnumerable<InlineFormulaEntry> inlineFormulaEntries)
 		{
 			try
 			{
 				inlineFormulaEntries = this.ParseFormulaEntries(formula);
+				return true;
+			}
+			catch (Exception ex)
+			{
+				inlineFormulaEntries = null;
+				return false;
+			}
+		}
+
+		public bool TryParseFormulaEntries(
+			IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection,
+			out IEnumerable<InlineFormulaEntry> inlineFormulaEntries)
+		{
+			try
+			{
+				inlineFormulaEntries = this.ParseFormulaEntries(inlineFormulaTokenCollection);
 				return true;
 			}
 			catch (Exception ex)
@@ -48,7 +65,15 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			if (formula is null)
 				throw new ArgumentNullException(nameof(formula));
 
-			return this.ParseFormula(formula);
+			return ParseFormula(this.ParseFormulaEntryTokens(formula));
+		}
+
+		public IEnumerable<InlineFormulaEntry> ParseFormulaEntries(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection)
+		{
+			if (!inlineFormulaTokenCollection?.Any() ?? true)
+				throw new ArgumentNullException(nameof(inlineFormulaTokenCollection));
+
+			return this.ParseFormula(inlineFormulaTokenCollection);
 		}
 
 		public IEnumerable<OperandInlineFormulaEntryInfo> GetListOfUsedVariablesInFormula(string formula)
@@ -56,46 +81,48 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			throw new NotImplementedException();
 		}
 
-		public bool ValidateFormulaSyntax(string formula, IEnumerable<string> supportedVariableCollection)
-		{
-
-			throw new NotImplementedException();
-		}
-
 		#endregion
 
 		#region Private Methods
 
-		private IEnumerable<InlineFormulaEntry> ParseFormula(string formula)
+		private IEnumerable<InlineFormulaEntry> ParseFormula(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection)
 		{
 			List<InlineFormulaEntry> toReturn = null;
 
-			if (!string.IsNullOrEmpty(formula))
-			{
-				toReturn = new List<InlineFormulaEntry>();
+			if (inlineFormulaTokenCollection != null)
+				toReturn = inlineFormulaTokenCollection.Select(entry => InlineFormulaEntryBuilder.ParseAndBuildInlineFormulaEntry(entry)).ToList();
 
-				var splitedEntries = formula.Split(' ');
-
-				var entryIndexCounter = 0;
-
-				for (int i = 0; i < splitedEntries.Length; i++)
-				{
-					if (!string.IsNullOrEmpty(splitedEntries[i]))
-					{
-						var entry = InlineFormulaEntryBuilder.ParseAndBuildInlineFormulaEntry(splitedEntries[i], entryIndexCounter);
-						toReturn.Add(entry);
-
-						entryIndexCounter++;
-					}
-				}
-			}
-
-			this.ProcessPostParsingValidation(toReturn);
+			this.SortAndValidateEntryOrder(toReturn);
 
 			return toReturn;
 		}
 
-		private void ProcessPostParsingValidation(List<InlineFormulaEntry> formulaEntries)
+		private IEnumerable<InlineFormulaEntryTokenDto> ParseFormulaEntryTokens(string formula)
+		{
+			var toReturn = new List<InlineFormulaEntryTokenDto>();
+
+			if (formula is null)
+				toReturn = null;
+			else if (!string.IsNullOrEmpty(formula))
+			{
+				var splitedEntryTokens = formula.Split(InlineFormulaEntryBuilder.TokenDelimiter);
+
+				var entryTokenIndexCounter = 0;
+
+				for (int i = 0; i < splitedEntryTokens.Length; i++)
+				{
+					if (!string.IsNullOrEmpty(splitedEntryTokens[i]))
+					{
+						toReturn.Add(new InlineFormulaEntryTokenDto(splitedEntryTokens[i], entryTokenIndexCounter));
+						entryTokenIndexCounter++;
+					}
+				}
+			}
+
+			return toReturn;
+		}
+
+		private void SortAndValidateEntryOrder(List<InlineFormulaEntry> formulaEntries)
 		{
 			if (formulaEntries is null)
 				throw new ArgumentNullException(nameof(formulaEntries));
