@@ -13,21 +13,34 @@ namespace InlineFormulaService
 
 			Console.BackgroundColor = ConsoleColor.White;
 			Console.ForegroundColor = ConsoleColor.Black;
+
 			do
 			{
 				Console.Clear();
 
 				WriteHeader();
-
+				Console.Write("Insert formula: ");
 				var formulaText = Console.ReadLine();
 
 				formulaText = string.IsNullOrEmpty(formulaText) ? "[Price] * 2 + [Quantity] - 5" : formulaText.Trim();
 
-				if (!string.IsNullOrEmpty(formulaText))
+				try
 				{
-					var entries = formulaService.TryParseFormulaEntries(formulaText,out var result);
+					if (!string.IsNullOrEmpty(formulaText))
+					{
+						var entries = formulaService.ParseFormulaEntries(formulaText);
+					}
+				}
+				catch (Exception ex)
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine($"\r\n{ex.Message}");
+					Console.ForegroundColor = ConsoleColor.Black;
 				}
 
+				Console.ForegroundColor = ConsoleColor.DarkGreen;
+				Console.WriteLine("\r\nPress ESC to exit or any other key to try again...");
+				Console.ForegroundColor = ConsoleColor.Black;
 			}
 			while (Console.ReadKey().Key != ConsoleKey.Escape);
 		}

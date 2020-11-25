@@ -1,5 +1,4 @@
-﻿using Septa.PayamGostar.Domain.Model.Enumeration.BaseInfo.InlineFormula;
-using System;
+﻿using System;
 
 namespace InlineFormulaService.Exceptions
 {
@@ -9,20 +8,6 @@ namespace InlineFormulaService.Exceptions
 
 		public InvalidFormulaSyntaxException(string message) :
 			base(string.Format(InvalidFormulaSyntaxDefaultErrorMessageFormat, message ?? string.Empty))
-		{
-
-		}
-	}
-
-	public class UnexpectedEntryTokenException : InvalidFormulaSyntaxException
-	{
-		public const string UnexpectedEntryTokenDefaultErrorMessageFormat = "Unexpected \"{0}\" Entry Token \"{1}\" at Index \"{2}\" (Zero-Based).";
-
-		public UnexpectedEntryTokenException(
-			InlineFormulaEntryType entryType,
-			string entryToken,
-			int entryIndex)
-			: base(string.Format(UnexpectedEntryTokenDefaultErrorMessageFormat, entryType, entryToken, entryIndex))
 		{
 
 		}

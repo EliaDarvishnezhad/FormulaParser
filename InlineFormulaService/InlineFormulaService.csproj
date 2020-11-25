@@ -51,10 +51,11 @@
     <Compile Include="Enumeration\InlineFormulaOperandType.cs" />
     <Compile Include="Enumeration\InlineFormulaOperatorType.cs" />
     <Compile Include="Exceptions\InvalidFormulaSyntaxException.cs" />
+    <Compile Include="Exceptions\UnexpectedEntryTokenException.cs" />
     <Compile Include="Interface\IProductInlineFormulaService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service\InlineFormulaEntryInfoBuilder.cs" />
+    <Compile Include="Service\InlineFormulaEntryBuilder.cs" />
     <Compile Include="Service\ProductInlineFormulaService.cs" />
   </ItemGroup>
   <ItemGroup>

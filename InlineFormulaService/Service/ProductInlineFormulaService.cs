@@ -80,36 +80,9 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 
 				for (int i = 0; i < splitedEntries.Length; i++)
 				{
-					InlineFormulaEntry entry = null;
 					if (!string.IsNullOrEmpty(splitedEntries[i]))
 					{
-						if (this.IsVariableEntry(splitedEntries[i]))
-						{
-							var entryInfo = new OperandInlineFormulaEntryInfo(splitedEntries[i], InlineFormulaOperandType.Variable);
-
-							entry = new InlineFormulaEntry(entryInfo, entryIndexCounter);
-						}
-						else if (this.IsConstantValueEntry(splitedEntries[i]))
-						{
-							var entryInfo = new OperandInlineFormulaEntryInfo(splitedEntries[i], InlineFormulaOperandType.ConstantValue);
-
-							entry = new InlineFormulaEntry(entryInfo, entryIndexCounter);
-						}
-						else if (this.IsOperatorEntry(splitedEntries[i]))
-						{
-							var revertedDictionary = InlineFormulaEntryInfoBuilder.OperatorTypeSignPairDictionary.ToDictionary(k => k.Value, v => v.Key);
-
-							var operatorType = revertedDictionary[splitedEntries[i].Trim().FirstOrDefault()];
-
-							var entryInfo = new OperatorInlineFormulaEntryInfo(splitedEntries[i], operatorType);
-
-							entry = new InlineFormulaEntry(entryInfo, entryIndexCounter);
-						}
-						else
-						{
-							throw new InvalidFormulaSyntaxException($"Invalid formula entry token: \" {entry} \" ");
-						}
-
+						var entry = InlineFormulaEntryBuilder.ParseAndBuildInlineFormulaEntry(splitedEntries[i], entryIndexCounter);
 						toReturn.Add(entry);
 
 						entryIndexCounter++;
@@ -118,51 +91,6 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			}
 
 			this.ProcessPostParsingValidation(toReturn);
-
-			return toReturn;
-		}
-
-		private bool IsVariableEntry(string entry)
-		{
-			var toReturn = false;
-
-			var trimmedEntry = entry?.Trim();
-
-			if (!string.IsNullOrEmpty(trimmedEntry))
-			{
-				if (trimmedEntry.StartsWith("[") &&
-					trimmedEntry.EndsWith("]") &&
-					trimmedEntry.Length > 2)
-				{
-					toReturn = true;
-				}
-			}
-
-			return toReturn;
-		}
-
-		private bool IsConstantValueEntry(string entry)
-		{
-			var toReturn = false;
-
-			var trimmedEntry = entry?.Trim();
-
-			if (!string.IsNullOrEmpty(trimmedEntry))
-			{
-				toReturn = decimal.TryParse(trimmedEntry, out _);
-			}
-
-			return toReturn;
-		}
-
-		private bool IsOperatorEntry(string entry)
-		{
-			var toReturn = false;
-
-			var trimmedEntry = entry?.Trim();
-
-			if (!string.IsNullOrEmpty(trimmedEntry))
-				toReturn = InlineFormulaEntryInfoBuilder.OperatorTypeSignPairDictionary.Values.Any(x => x.ToString().Equals(trimmedEntry));
 
 			return toReturn;
 		}
