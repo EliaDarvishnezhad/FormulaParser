@@ -3,7 +3,7 @@ using System;
 
 namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 {
-	public class InlineFormulaEntry
+	public class InlineFormulaEntry : IComparable<InlineFormulaEntry>
 	{
 		/// <summary>
 		/// Initializes an instance of <b>InlineFormulaEntry</b> Class For Operand Entry Type
@@ -52,6 +52,11 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 		public override string ToString()
 		{
 			return this.EntryInfo.RawToken;
+		}
+
+		public int CompareTo(InlineFormulaEntry other)
+		{
+			return this.EntryIndex.CompareTo(other?.EntryIndex ?? int.MaxValue);
 		}
 	}
 }

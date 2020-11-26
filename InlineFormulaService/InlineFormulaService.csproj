@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dto\BaseInlineFormulaEntryInfo.cs" />
+    <Compile Include="Dto\InlineFormula.cs" />
     <Compile Include="Dto\InlineFormulaEntry.cs" />
     <Compile Include="Dto\InlineFormulaEntryTokenDto.cs" />
     <Compile Include="Dto\OperandInlineFormulaEntryInfo.cs" />

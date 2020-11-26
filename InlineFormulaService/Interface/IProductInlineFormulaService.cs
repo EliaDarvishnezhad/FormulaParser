@@ -1,19 +1,20 @@
-﻿using Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula;
+﻿using InlineFormulaService.Dto;
+using Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula;
 using System.Collections.Generic;
 
 namespace Septa.PayamGostar.Domain.Service.ProductManagement
 {
 	public interface IProductInlineFormulaService
 	{
-		IEnumerable<InlineFormulaEntry> ParseFormulaEntries(string formula);
-		IEnumerable<InlineFormulaEntry> ParseFormulaEntries(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection);
+		InlineFormula ParseFormulaEntries(string formula);
+		InlineFormula ParseFormulaEntries(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection);
 
 		bool TryParseFormulaEntries(
 			string formula,
-			out IEnumerable<InlineFormulaEntry> inlineFormulaEntries);
+			out InlineFormula inlineFormula);
 		bool TryParseFormulaEntries(
 			IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection,
-			out IEnumerable<InlineFormulaEntry> inlineFormulaEntries);
+			out InlineFormula inlineFormula);
 
 
 		IEnumerable<OperandInlineFormulaEntryInfo> GetListOfUsedVariablesInFormula(string formula);

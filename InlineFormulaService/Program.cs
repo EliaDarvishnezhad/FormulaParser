@@ -28,7 +28,11 @@ namespace InlineFormulaService
 				{
 					if (!string.IsNullOrEmpty(formulaText))
 					{
-						var entries = formulaService.ParseFormulaEntries(formulaText);
+						var formula = formulaService.ParseFormulaEntries(formulaText);
+
+						Console.ForegroundColor = ConsoleColor.DarkCyan;
+						Console.WriteLine(formula);
+						Console.ForegroundColor = ConsoleColor.Black;
 					}
 				}
 				catch (Exception ex)

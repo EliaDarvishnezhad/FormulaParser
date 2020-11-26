@@ -1,4 +1,5 @@
-﻿using InlineFormulaService.Exceptions;
+﻿using InlineFormulaService.Dto;
+using InlineFormulaService.Exceptions;
 using InlineFormulaService.Service;
 using Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula;
 using Septa.PayamGostar.Domain.Model.Enumeration.BaseInfo.InlineFormula;
@@ -30,50 +31,50 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 
 		public bool TryParseFormulaEntries(
 			string formula,
-			out IEnumerable<InlineFormulaEntry> inlineFormulaEntries)
+			out InlineFormula inlineFormula)
 		{
 			try
 			{
-				inlineFormulaEntries = this.ParseFormulaEntries(formula);
+				inlineFormula = this.ParseFormulaEntries(formula);
 				return true;
 			}
 			catch (Exception ex)
 			{
-				inlineFormulaEntries = null;
+				inlineFormula = null;
 				return false;
 			}
 		}
 
 		public bool TryParseFormulaEntries(
 			IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection,
-			out IEnumerable<InlineFormulaEntry> inlineFormulaEntries)
+			out InlineFormula inlineFormula)
 		{
 			try
 			{
-				inlineFormulaEntries = this.ParseFormulaEntries(inlineFormulaTokenCollection);
+				inlineFormula = this.ParseFormulaEntries(inlineFormulaTokenCollection);
 				return true;
 			}
 			catch (Exception ex)
 			{
-				inlineFormulaEntries = null;
+				inlineFormula = null;
 				return false;
 			}
 		}
 
-		public IEnumerable<InlineFormulaEntry> ParseFormulaEntries(string formula)
+		public InlineFormula ParseFormulaEntries(string formula)
 		{
 			if (formula is null)
 				throw new ArgumentNullException(nameof(formula));
 
-			return ParseFormula(this.ParseFormulaEntryTokens(formula));
+			return new InlineFormula(ParseFormula(this.ParseFormulaEntryTokens(formula)));
 		}
 
-		public IEnumerable<InlineFormulaEntry> ParseFormulaEntries(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection)
+		public InlineFormula ParseFormulaEntries(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection)
 		{
 			if (!inlineFormulaTokenCollection?.Any() ?? true)
 				throw new ArgumentNullException(nameof(inlineFormulaTokenCollection));
 
-			return this.ParseFormula(inlineFormulaTokenCollection);
+			return new InlineFormula(this.ParseFormula(inlineFormulaTokenCollection));
 		}
 
 		public IEnumerable<OperandInlineFormulaEntryInfo> GetListOfUsedVariablesInFormula(string formula)
