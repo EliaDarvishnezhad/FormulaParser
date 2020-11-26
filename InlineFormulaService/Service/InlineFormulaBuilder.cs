@@ -2,11 +2,12 @@
 using Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula;
 using Septa.PayamGostar.Domain.Model.Enumeration.BaseInfo.InlineFormula;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace InlineFormulaService.Service
 {
-	public static class InlineFormulaEntryBuilder
+	public static class InlineFormulaBuilder
 	{
 		#region Constant Values
 
@@ -64,6 +65,38 @@ namespace InlineFormulaService.Service
 				throw new ArgumentNullException(nameof(inlineFormulaEntryToken));
 
 			return ParseAndBuildInlineFormulaEntry(inlineFormulaEntryToken.Token, inlineFormulaEntryToken.Index);
+		}
+
+		public static void SortAndValidateEntryOrder(List<InlineFormulaEntry> formulaEntries)
+		{
+			if (formulaEntries is null)
+				throw new ArgumentNullException(nameof(formulaEntries));
+
+			if (formulaEntries.Any())
+			{
+				formulaEntries = formulaEntries.OrderBy(x => x.EntryIndex).ToList();
+
+				var firstEntry = formulaEntries.Single(x => x.EntryIndex == 0);
+
+				if (firstEntry.EntryType == InlineFormulaEntryType.Operator)
+					throw new UnexpectedEntryTokenException(
+						firstEntry.EntryType,
+						firstEntry.EntryInfo.RawToken,
+						firstEntry.EntryIndex);
+
+				for (int i = 0; i < formulaEntries.Count; i++)
+				{
+					var nextEntryIndex = i + 1;
+					if (nextEntryIndex < formulaEntries.Count)
+					{
+						if (formulaEntries[i].EntryType == formulaEntries[nextEntryIndex].EntryType)
+							throw new UnexpectedEntryTokenException(
+								formulaEntries[nextEntryIndex].EntryType,
+								formulaEntries[nextEntryIndex].EntryInfo.RawToken,
+								formulaEntries[nextEntryIndex].EntryIndex);
+					}
+				}
+			}
 		}
 	}
 }

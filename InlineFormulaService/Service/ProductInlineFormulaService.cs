@@ -1,8 +1,6 @@
 ﻿using InlineFormulaService.Dto;
-using InlineFormulaService.Exceptions;
 using InlineFormulaService.Service;
 using Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula;
-using Septa.PayamGostar.Domain.Model.Enumeration.BaseInfo.InlineFormula;
 using Septa.PayamGostar.Domain.Service.ProductManagement;
 using System;
 using System.Collections.Generic;
@@ -21,12 +19,16 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 
 		public decimal CalculateFormula(string formula, Dictionary<string, decimal> variableValues)
 		{
-			throw new NotImplementedException();
+			var inlineFormula = this.ParseFormulaEntries(formula);
+
+			return inlineFormula.CalculateFormula(variableValues);
 		}
 
-		public decimal CalculateFormula(IEnumerable<InlineFormulaEntry> inlineFormulaEntries, Dictionary<string, decimal> variableValues)
+		public decimal CalculateFormula(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaEntryTokens, Dictionary<string, decimal> variableValues)
 		{
-			throw new NotImplementedException();
+			var inlineFormula = this.ParseFormulaEntries(inlineFormulaEntryTokens);
+
+			return inlineFormula.CalculateFormula(variableValues);
 		}
 
 		public bool TryParseFormulaEntries(
@@ -91,9 +93,9 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			List<InlineFormulaEntry> toReturn = null;
 
 			if (inlineFormulaTokenCollection != null)
-				toReturn = inlineFormulaTokenCollection.Select(entry => InlineFormulaEntryBuilder.ParseAndBuildInlineFormulaEntry(entry)).ToList();
+				toReturn = inlineFormulaTokenCollection.Select(entry => InlineFormulaBuilder.ParseAndBuildInlineFormulaEntry(entry)).ToList();
 
-			this.SortAndValidateEntryOrder(toReturn);
+			InlineFormulaBuilder.SortAndValidateEntryOrder(toReturn);
 
 			return toReturn;
 		}
@@ -106,7 +108,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 				toReturn = null;
 			else if (!string.IsNullOrEmpty(formula))
 			{
-				var splitedEntryTokens = formula.Split(InlineFormulaEntryBuilder.TokenDelimiter);
+				var splitedEntryTokens = formula.Split(InlineFormulaBuilder.TokenDelimiter);
 
 				var entryTokenIndexCounter = 0;
 
@@ -121,38 +123,6 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			}
 
 			return toReturn;
-		}
-
-		private void SortAndValidateEntryOrder(List<InlineFormulaEntry> formulaEntries)
-		{
-			if (formulaEntries is null)
-				throw new ArgumentNullException(nameof(formulaEntries));
-
-			if (formulaEntries.Any())
-			{
-				formulaEntries = formulaEntries.OrderBy(x => x.EntryIndex).ToList();
-
-				var firstEntry = formulaEntries.Single(x => x.EntryIndex == 0);
-
-				if (firstEntry.EntryType == InlineFormulaEntryType.Operator)
-					throw new UnexpectedEntryTokenException(
-						firstEntry.EntryType,
-						firstEntry.EntryInfo.RawToken,
-						firstEntry.EntryIndex);
-
-				for (int i = 0; i < formulaEntries.Count; i++)
-				{
-					var nextEntryIndex = i + 1;
-					if (nextEntryIndex < formulaEntries.Count)
-					{
-						if (formulaEntries[i].EntryType == formulaEntries[nextEntryIndex].EntryType)
-							throw new UnexpectedEntryTokenException(
-								formulaEntries[nextEntryIndex].EntryType,
-								formulaEntries[nextEntryIndex].EntryInfo.RawToken,
-								formulaEntries[nextEntryIndex].EntryIndex);
-					}
-				}
-			}
 		}
 
 		#endregion

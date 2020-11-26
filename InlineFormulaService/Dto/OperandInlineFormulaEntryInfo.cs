@@ -15,8 +15,41 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 		}
 
 		public override string Key => this.GetOperandKeyForUseInCalculation();
-
 		public InlineFormulaOperandType OperandType { get; private set; }
+
+		private decimal _valueStore;
+		public decimal Value
+		{
+			get
+			{
+				switch (this.OperandType)
+				{
+					case InlineFormulaOperandType.ConstantValue:
+						return decimal.Parse(this.Key);
+
+					case InlineFormulaOperandType.Variable:
+						return _valueStore;
+
+					default:
+						throw new NotSupportedException();
+				}
+			}
+			set
+			{
+				switch (this.OperandType)
+				{
+					case InlineFormulaOperandType.ConstantValue:
+						break;
+
+					case InlineFormulaOperandType.Variable:
+						_valueStore = value;
+						break;
+
+					default:
+						throw new NotSupportedException();
+				}
+			}
+		}
 
 		private string GetOperandKeyForUseInCalculation()
 		{
@@ -33,7 +66,7 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 
 		#endregion
 
-		#region static Members
+		#region Static Members
 
 		public static bool IsOperandEntryOfType(
 			string entryToken,
@@ -83,6 +116,66 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 			}
 
 			return toReturn;
+		}
+
+		#endregion
+
+		#region Operator Override
+
+		public static decimal operator +(
+			OperandInlineFormulaEntryInfo leftHandOperand,
+			OperandInlineFormulaEntryInfo rightHandOperand)
+		{
+			return leftHandOperand.Value + rightHandOperand.Value;
+		}
+
+		public static decimal operator +(
+			decimal leftHandOperand,
+			OperandInlineFormulaEntryInfo rightHandOperand)
+		{
+			return leftHandOperand + rightHandOperand.Value;
+		}
+
+		public static decimal operator -(
+			OperandInlineFormulaEntryInfo leftHandOperand,
+			OperandInlineFormulaEntryInfo rightHandOperand)
+		{
+			return leftHandOperand.Value - rightHandOperand.Value;
+		}
+
+		public static decimal operator -(
+			decimal leftHandOperand,
+			OperandInlineFormulaEntryInfo rightHandOperand)
+		{
+			return leftHandOperand - rightHandOperand.Value;
+		}
+
+		public static decimal operator *(
+			OperandInlineFormulaEntryInfo leftHandOperand,
+			OperandInlineFormulaEntryInfo rightHandOperand)
+		{
+			return leftHandOperand.Value * rightHandOperand.Value;
+		}
+
+		public static decimal operator *(
+			decimal leftHandOperand,
+			OperandInlineFormulaEntryInfo rightHandOperand)
+		{
+			return leftHandOperand * rightHandOperand.Value;
+		}
+
+		public static decimal operator /(
+			OperandInlineFormulaEntryInfo leftHandOperand,
+			OperandInlineFormulaEntryInfo rightHandOperand)
+		{
+			return leftHandOperand.Value / rightHandOperand.Value;
+		}
+
+		public static decimal operator /(
+			decimal leftHandOperand,
+			OperandInlineFormulaEntryInfo rightHandOperand)
+		{
+			return leftHandOperand / rightHandOperand.Value;
 		}
 
 		#endregion

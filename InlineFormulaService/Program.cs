@@ -30,8 +30,14 @@ namespace InlineFormulaService
 					{
 						var formula = formulaService.ParseFormulaEntries(formulaText);
 
+						var fomulaVaribaleValues = formula.GetListOfUsedVariables().ToDictionary(x => x, x => 1m);
+
+						var formulaResult = formula.CalculateFormula(fomulaVaribaleValues);
+
 						Console.ForegroundColor = ConsoleColor.DarkCyan;
 						Console.WriteLine(formula);
+						Console.WriteLine(string.Join(", ", fomulaVaribaleValues.Select(x => $"{x.Key}={x.Value}")));
+						Console.WriteLine(formulaResult);
 						Console.ForegroundColor = ConsoleColor.Black;
 					}
 				}

@@ -23,18 +23,6 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 		public const char AsteriskSign = '*';
 		public const char SlashSign = '/';
 
-		public static bool IsOperatorEntry(string entryToken)
-		{
-			var toReturn = false;
-
-			var trimmedEntry = entryToken?.Trim();
-
-			if (!string.IsNullOrEmpty(trimmedEntry))
-				toReturn = SupportedOperatorTypeSignPairDictionary.Values.Any(x => x.ToString().Equals(trimmedEntry));
-
-			return toReturn;
-		}
-
 		private static Dictionary<InlineFormulaOperatorType, char> _operatorTypeSignPairDictionary;
 		public static Dictionary<InlineFormulaOperatorType, char> SupportedOperatorTypeSignPairDictionary
 		{
@@ -52,7 +40,18 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 			}
 		}
 
-		#endregion
+		public static bool IsOperatorEntry(string entryToken)
+		{
+			var toReturn = false;
 
+			var trimmedEntry = entryToken?.Trim();
+
+			if (!string.IsNullOrEmpty(trimmedEntry))
+				toReturn = SupportedOperatorTypeSignPairDictionary.Values.Any(x => x.ToString().Equals(trimmedEntry));
+
+			return toReturn;
+		}
+
+		#endregion
 	}
 }

@@ -1,4 +1,6 @@
-﻿using Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula;
+﻿using InlineFormulaService.Exceptions;
+using InlineFormulaService.Service;
+using Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula;
 using Septa.PayamGostar.Domain.Model.Enumeration.BaseInfo.InlineFormula;
 using System;
 using System.Collections;
@@ -8,11 +10,13 @@ using System.Text;
 
 namespace InlineFormulaService.Dto
 {
-	public class InlineFormula : IComparer<InlineFormulaEntry>, IEnumerable
+	public class InlineFormula : IComparer<InlineFormulaEntry>, IEnumerable<InlineFormulaEntry>
 	{
 		#region Properties & Indexers
 
 		public InlineFormulaEntry this[int index] => _underlyingCollection.ElementAtOrDefault(index);
+
+		public int Count => this._underlyingCollection.Count;
 
 		private IEnumerable<InlineFormulaEntry> VariableOperandEntries
 		{
@@ -39,6 +43,8 @@ namespace InlineFormulaService.Dto
 			if (formulaEntries is null)
 				throw new ArgumentNullException(nameof(formulaEntries));
 
+			InlineFormulaBuilder.SortAndValidateEntryOrder(formulaEntries.ToList());
+
 			this._underlyingCollection = new SortedSet<InlineFormulaEntry>(formulaEntries, this);
 		}
 
@@ -49,11 +55,6 @@ namespace InlineFormulaService.Dto
 		public int Compare(InlineFormulaEntry x, InlineFormulaEntry y)
 		{
 			return x.CompareTo(y);
-		}
-
-		public IEnumerator GetEnumerator()
-		{
-			return _underlyingCollection.GetEnumerator();
 		}
 
 		public override string ToString()
@@ -77,9 +78,56 @@ namespace InlineFormulaService.Dto
 
 			if (usedVariables.Any(v => !formulaVariableValues.ContainsKey(v)))
 			{
+				var emptyVariableName = usedVariables.FirstOrDefault(v => !formulaVariableValues.ContainsKey(v));
+				throw new VariableValueNotSpecifiedException(emptyVariableName);
 			}
 
-			throw new NotImplementedException();
+			decimal result = 0;
+
+			if (this.Any())
+			{
+				foreach (var item in this.OfType<InlineFormulaEntry>())
+				{
+					if (item.EntryType == InlineFormulaEntryType.Operand &&
+						(item.EntryInfo as OperandInlineFormulaEntryInfo).OperandType == InlineFormulaOperandType.Variable)
+					{
+						(item.EntryInfo as OperandInlineFormulaEntryInfo).Value = formulaVariableValues[item.EntryInfo.Key];
+					}
+				}
+
+				if (this[0].EntryType == InlineFormulaEntryType.Operand)
+				{
+					result = (this[0].EntryInfo as OperandInlineFormulaEntryInfo).Value;
+
+					for (int i = 1; i < this.Count; i += 2)
+					{
+						var nextOperandIndex = i + 1;
+
+						if (nextOperandIndex < this.Count)
+						{
+							switch ((this[i].EntryInfo as OperatorInlineFormulaEntryInfo)?.OperatorType)
+							{
+								case InlineFormulaOperatorType.Add:
+									result += this[nextOperandIndex].EntryInfo as OperandInlineFormulaEntryInfo;
+									break;
+								case InlineFormulaOperatorType.Subtract:
+									result -= this[nextOperandIndex].EntryInfo as OperandInlineFormulaEntryInfo;
+									break;
+								case InlineFormulaOperatorType.Multiply:
+									result *= this[nextOperandIndex].EntryInfo as OperandInlineFormulaEntryInfo;
+									break;
+								case InlineFormulaOperatorType.Divide:
+									result /= this[nextOperandIndex].EntryInfo as OperandInlineFormulaEntryInfo;
+									break;
+								default:
+									throw new NotSupportedException();
+							}
+						}
+					}
+				}
+			}
+
+			return result;
 		}
 
 		#endregion
@@ -96,6 +144,16 @@ namespace InlineFormulaService.Dto
 			}
 
 			return formulaBuilder.ToString().Trim();
+		}
+
+		IEnumerator<InlineFormulaEntry> IEnumerable<InlineFormulaEntry>.GetEnumerator()
+		{
+			return _underlyingCollection.GetEnumerator();
+		}
+
+		public IEnumerator GetEnumerator()
+		{
+			return _underlyingCollection.GetEnumerator();
 		}
 
 		#endregion
