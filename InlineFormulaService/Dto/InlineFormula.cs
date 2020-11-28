@@ -10,12 +10,25 @@ using System.Text;
 
 namespace InlineFormulaService.Dto
 {
+	/// <summary>
+	/// <b>InlineFormula</b> Class is a container of formula entries .</br>
+	/// Handles Iterating Over Formula Entries.
+	/// Handles Operations Such as Validating, Evaluating, And Retrieving Formula Entries
+	/// </summary>
 	public class InlineFormula : IComparer<InlineFormulaEntry>, IEnumerable<InlineFormulaEntry>
 	{
 		#region Properties & Indexers
 
+		/// <summary>
+		/// Indexer of Formula Entries
+		/// </summary>
+		/// <param name="index">Index of entry</param>
+		/// <returns cref="InlineFormulaEntry">Returns <b>InlineFormulaEntry</b> at Specified Index</returns>
 		public InlineFormulaEntry this[int index] => _underlyingCollection.ElementAtOrDefault(index);
 
+		/// <summary>
+		/// Count of formula entries (Operands and Operators Between Them)
+		/// </summary>
 		public int Count => this._underlyingCollection.Count;
 
 		private IEnumerable<InlineFormulaEntry> VariableOperandEntries
@@ -38,6 +51,11 @@ namespace InlineFormulaService.Dto
 
 		#region Constructor
 
+		/// <summary>
+		/// Initializes an Instance of FormulaEntry with Given FormulaEntries
+		/// </summary>
+		/// <param name="formulaEntries">Collection Of <b>InlineFormulaEntry</b> to Initialize Formula with
+		/// <seealso cref="InlineFormulaEntry"/></param>
 		public InlineFormula(IEnumerable<InlineFormulaEntry> formulaEntries)
 		{
 			if (formulaEntries is null)
@@ -62,6 +80,10 @@ namespace InlineFormulaService.Dto
 			return this.GetFormulaText();
 		}
 
+		/// <summary>
+		/// Returns the List of Variable Keys</b>
+		/// </summary>
+		/// <returns>List of String Containing List of Variable Keys.</returns>
 		public List<string> GetListOfUsedVariables()
 		{
 			return this.VariableOperandEntries?
@@ -70,6 +92,11 @@ namespace InlineFormulaService.Dto
 				.ToList();
 		}
 
+		/// <summary>
+		/// Calculates formula and returns the result number in decimal type
+		/// </summary>
+		/// <param name="formulaVariableValues">A Dictionary of Variables and Their Corresponding Value</param>
+		/// <returns>Returns Result of Formula Expression</returns>
 		public decimal CalculateFormula(Dictionary<string, decimal> formulaVariableValues)
 		{
 			var usedVariables = this.GetListOfUsedVariables();
@@ -120,6 +147,9 @@ namespace InlineFormulaService.Dto
 								case InlineFormulaOperatorType.Divide:
 									result /= this[nextOperandIndex].EntryInfo as OperandInlineFormulaEntryInfo;
 									break;
+								case InlineFormulaOperatorType.Power:
+									result ^= this[nextOperandIndex].EntryInfo as OperandInlineFormulaEntryInfo;
+									break;
 								default:
 									throw new NotSupportedException();
 							}
@@ -129,6 +159,16 @@ namespace InlineFormulaService.Dto
 			}
 
 			return result;
+		}
+
+		IEnumerator<InlineFormulaEntry> IEnumerable<InlineFormulaEntry>.GetEnumerator()
+		{
+			return _underlyingCollection.GetEnumerator();
+		}
+
+		public IEnumerator GetEnumerator()
+		{
+			return _underlyingCollection.GetEnumerator();
 		}
 
 		#endregion
@@ -145,16 +185,6 @@ namespace InlineFormulaService.Dto
 			}
 
 			return formulaBuilder.ToString().Trim();
-		}
-
-		IEnumerator<InlineFormulaEntry> IEnumerable<InlineFormulaEntry>.GetEnumerator()
-		{
-			return _underlyingCollection.GetEnumerator();
-		}
-
-		public IEnumerator GetEnumerator()
-		{
-			return _underlyingCollection.GetEnumerator();
 		}
 
 		#endregion

@@ -16,9 +16,6 @@ namespace Septa.PayamGostar.Domain.Service.ProductManagement
 			IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection,
 			out InlineFormula inlineFormula);
 
-
-		IEnumerable<OperandInlineFormulaEntryInfo> GetListOfUsedVariablesInFormula(string formula);
-
 		decimal CalculateFormula(string formula, Dictionary<string, decimal> variableValues);
 		decimal CalculateFormula(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaEntryTokens, Dictionary<string, decimal> variableValues);
 	}

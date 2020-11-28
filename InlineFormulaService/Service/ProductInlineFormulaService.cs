@@ -79,11 +79,6 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			return new InlineFormula(this.ParseFormula(inlineFormulaTokenCollection));
 		}
 
-		public IEnumerable<OperandInlineFormulaEntryInfo> GetListOfUsedVariablesInFormula(string formula)
-		{
-			throw new NotImplementedException();
-		}
-
 		#endregion
 
 		#region Private Methods

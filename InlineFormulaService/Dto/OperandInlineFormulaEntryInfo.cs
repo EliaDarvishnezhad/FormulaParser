@@ -178,6 +178,34 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 			return leftHandOperand / rightHandOperand.Value;
 		}
 
+
+		public static decimal operator ^(
+			OperandInlineFormulaEntryInfo baseOperand,
+			OperandInlineFormulaEntryInfo power)
+		{
+			return (decimal)Math.Pow(
+				unchecked((double)(baseOperand?.Value ?? 0m)),
+				unchecked((double)(power?.Value ?? 0m)));
+		}
+
+		public static decimal operator ^(
+			decimal baseOperand,
+			OperandInlineFormulaEntryInfo power)
+		{
+			return (decimal)Math.Pow(
+				unchecked((double)baseOperand),
+				unchecked((double)(power?.Value ?? 0m)));
+		}
+
+		public static decimal operator ^(
+			OperandInlineFormulaEntryInfo baseOperand,
+			 decimal power)
+		{
+			return (decimal)Math.Pow(
+				unchecked((double)(baseOperand?.Value ?? 0m)),
+				unchecked((double)power));
+		}
+
 		#endregion
 	}
 }

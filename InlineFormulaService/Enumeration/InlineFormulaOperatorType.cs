@@ -6,5 +6,6 @@
         Subtract = 1,
         Multiply = 2,
         Divide = 3,
+		Power = 4
     }
 }
