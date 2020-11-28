@@ -66,6 +66,7 @@ namespace InlineFormulaService.Dto
 		{
 			return this.VariableOperandEntries?
 				.Select((x) => x.EntryInfo.Key)
+				.Distinct()
 				.ToList();
 		}
 
