@@ -379,23 +379,4 @@ $RECYCLE.BIN/
 # Mac crap
 .DS_Store
 
-# =========================
-# PayamGostar specifics
-# =========================
-
-PresentationLayer/Web/Portals/WebUI/*.txt
-PresentationLayer/Web/Portals/WebUI/ImagesDB/
-App_Data/
-*.sln.cache
-*.orig
-#.vscode/
-.build/
-.testPublish/
-
-# Ignore other intermediate files that NuGet might create. project.lock.json is used in conjunction
-# with project.json (NuGet v3); project.assets.json is used in conjunction with the PackageReference
-# format (NuGet v4 and .NET Core).
-project.lock.json
-project.assets.json
-
 
