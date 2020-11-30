@@ -22,6 +22,7 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 		public const char MinusSign = '-';
 		public const char AsteriskSign = '*';
 		public const char SlashSign = '/';
+		public const char ExponentSign = '^';
 
 		private static Dictionary<InlineFormulaOperatorType, char> _operatorTypeSignPairDictionary;
 		public static Dictionary<InlineFormulaOperatorType, char> SupportedOperatorTypeSignPairDictionary
@@ -30,11 +31,14 @@ namespace Septa.PayamGostar.Domain.Dto.BaseInfo.InlineFormula
 			{
 				if (_operatorTypeSignPairDictionary is null)
 				{
-					_operatorTypeSignPairDictionary = new Dictionary<InlineFormulaOperatorType, char>(){
-					{ InlineFormulaOperatorType.Add, PlusSign},
-					{ InlineFormulaOperatorType.Subtract, MinusSign },
-					{ InlineFormulaOperatorType.Multiply, AsteriskSign },
-					{ InlineFormulaOperatorType.Divide, SlashSign }};
+					_operatorTypeSignPairDictionary = new Dictionary<InlineFormulaOperatorType, char>()
+					{
+						{ InlineFormulaOperatorType.Add, PlusSign},
+						{ InlineFormulaOperatorType.Subtract, MinusSign },
+						{ InlineFormulaOperatorType.Multiply, AsteriskSign },
+						{ InlineFormulaOperatorType.Divide, SlashSign },
+						{ InlineFormulaOperatorType.Power, ExponentSign}
+					};
 				}
 				return _operatorTypeSignPairDictionary;
 			}

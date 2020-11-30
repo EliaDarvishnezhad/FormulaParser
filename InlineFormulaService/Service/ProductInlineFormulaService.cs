@@ -24,7 +24,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			return inlineFormula.CalculateFormula(variableValues);
 		}
 
-		public decimal CalculateFormula(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaEntryTokens, Dictionary<string, decimal> variableValues)
+		public decimal CalculateFormula(IEnumerable<InlineFormulaTokenIndexDto> inlineFormulaEntryTokens, Dictionary<string, decimal> variableValues)
 		{
 			var inlineFormula = this.ParseFormulaEntries(inlineFormulaEntryTokens);
 
@@ -48,7 +48,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 		}
 
 		public bool TryParseFormulaEntries(
-			IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection,
+			IEnumerable<InlineFormulaTokenIndexDto> inlineFormulaTokenCollection,
 			out InlineFormula inlineFormula)
 		{
 			try
@@ -71,7 +71,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 			return new InlineFormula(ParseFormula(this.ParseFormulaEntryTokens(formula)));
 		}
 
-		public InlineFormula ParseFormulaEntries(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection)
+		public InlineFormula ParseFormulaEntries(IEnumerable<InlineFormulaTokenIndexDto> inlineFormulaTokenCollection)
 		{
 			if (!inlineFormulaTokenCollection?.Any() ?? true)
 				throw new ArgumentNullException(nameof(inlineFormulaTokenCollection));
@@ -83,27 +83,27 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 
 		#region Private Methods
 
-		private IEnumerable<InlineFormulaEntry> ParseFormula(IEnumerable<InlineFormulaEntryTokenDto> inlineFormulaTokenCollection)
+		private IEnumerable<InlineFormulaEntry> ParseFormula(IEnumerable<InlineFormulaTokenIndexDto> inlineFormulaTokenCollection)
 		{
 			List<InlineFormulaEntry> toReturn = null;
 
 			if (inlineFormulaTokenCollection != null)
-				toReturn = inlineFormulaTokenCollection.Select(entry => InlineFormulaBuilder.ParseAndBuildInlineFormulaEntry(entry)).ToList();
+				toReturn = inlineFormulaTokenCollection.Select(entry => InlineFormulaHelper.ParseAndBuildInlineFormulaEntry(entry)).ToList();
 
-			InlineFormulaBuilder.SortAndValidateEntryOrder(toReturn);
+			InlineFormulaHelper.SortAndValidateEntryOrder(toReturn);
 
 			return toReturn;
 		}
 
-		private IEnumerable<InlineFormulaEntryTokenDto> ParseFormulaEntryTokens(string formula)
+		private IEnumerable<InlineFormulaTokenIndexDto> ParseFormulaEntryTokens(string formula)
 		{
-			var toReturn = new List<InlineFormulaEntryTokenDto>();
+			var toReturn = new List<InlineFormulaTokenIndexDto>();
 
 			if (formula is null)
 				toReturn = null;
 			else if (!string.IsNullOrEmpty(formula))
 			{
-				var splitedEntryTokens = formula.Split(InlineFormulaBuilder.TokenDelimiter);
+				var splitedEntryTokens = formula.Split(InlineFormulaHelper.TokenDelimiter);
 
 				var entryTokenIndexCounter = 0;
 
@@ -111,7 +111,7 @@ namespace Septa.PayamGostar.CrmService.ProductManagement
 				{
 					if (!string.IsNullOrEmpty(splitedEntryTokens[i]))
 					{
-						toReturn.Add(new InlineFormulaEntryTokenDto(splitedEntryTokens[i], entryTokenIndexCounter));
+						toReturn.Add(new InlineFormulaTokenIndexDto(splitedEntryTokens[i], entryTokenIndexCounter));
 						entryTokenIndexCounter++;
 					}
 				}

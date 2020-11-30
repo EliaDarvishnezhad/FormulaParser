@@ -61,7 +61,7 @@ namespace InlineFormulaService.Dto
 			if (formulaEntries is null)
 				throw new ArgumentNullException(nameof(formulaEntries));
 
-			InlineFormulaBuilder.SortAndValidateEntryOrder(formulaEntries.ToList());
+			InlineFormulaHelper.SortAndValidateEntryOrder(formulaEntries.ToList());
 
 			this._underlyingCollection = new SortedSet<InlineFormulaEntry>(formulaEntries, this);
 		}
